@@ -83,31 +83,44 @@ module Viewpoint::EWS::SOAP
     #   NOTE: there are specialized keys for text (:text), child elements
     #   (:sub_elements) and namespaces (:xmlns).
     def build_xml!(elems)
-      case elems.class.name
-      when 'Hash'
-        keys = elems.keys
-        vals = elems.values
-        if(keys.length > 1 && !vals.is_a?(Hash))
-          raise "invalid input: #{elems}"
-        end
-        vals = vals.first.clone
-        se = vals.delete(:sub_elements)
-        txt = vals.delete(:text)
-        xmlns_attribute = vals.delete(:xmlns_attribute)
+      elems_type = elems.class.name
 
-        node = @nbuild.send(camel_case(keys.first), txt, vals) {|x|
+      return build_xml_by_array(elems) if elems_type == 'Array'
+      return build_xml_by_hash(elems) if elems_type == 'Hash'
+
+      raise "Unsupported type: #{elems_type}"
+    end
+
+    def build_xml_by_array(elems)
+      elems.each { |e| build_xml!(e) }
+    end
+
+    def build_xml_by_hash(elems)
+      raise "invalid input: #{elems}" unless valid_xml_hash?(elems)
+
+      key = elems.keys.first
+      vals = elems.values.first.clone
+
+      se = vals.delete(:sub_elements)
+      txt = vals.delete(:text)
+      xmlns_attribute = vals.delete(:xmlns_attribute)
+
+      node = bulid_xml_by_key_method(key, vals) ||
+        @nbuild.send(camel_case(key), txt, vals) do |x|
           build_xml!(se) if se
-        }
-
-        # Set node level namespace
-        node.xmlns = NAMESPACES["xmlns:#{xmlns_attribute}"] if xmlns_attribute
-      when 'Array'
-        elems.each do |e|
-          build_xml!(e)
         end
-      else
-        raise "Unsupported type: #{elems.class.name}"
-      end
+
+      # Set node level namespace
+      node.xmlns = NAMESPACES["xmlns:#{xmlns_attribute}"] if xmlns_attribute
+    end
+
+    def bulid_xml_by_key_method(method, attributes)
+      return nil unless [:optional_attendees, :required_attendees].include?(method.to_sym)
+      send("#{method}!", attributes)
+    end
+
+    def valid_xml_hash?(elems)
+      elems.keys.length == 1 || elems.values.is_a?(Hash)
     end
 
     # Build the FolderShape element
@@ -384,7 +397,7 @@ module Viewpoint::EWS::SOAP
       nbuild[NS_EWS_TYPES].RoutingType(type)
     end
 
-    def mailbox_type!(type)Standard
+    def mailbox_type!(type)
       nbuild[NS_EWS_TYPES].MailboxType(type)
     end
 
@@ -1021,10 +1034,6 @@ module Viewpoint::EWS::SOAP
       nbuild[NS_EWS_TYPES].IsAllDayEvent(all_day)
     end
 
-    def is_response_requested!(response_requested)
-      nbuild[NS_EWS_TYPES].IsResponseRequested(response_requested)
-    end
-
     def reminder_is_set!(reminder)
       nbuild[NS_EWS_TYPES].ReminderIsSet reminder
     end
@@ -1262,33 +1271,6 @@ module Viewpoint::EWS::SOAP
       @nbuild[NS_EWS_MESSAGES].GetRoomLists
     end
 
-    def accept_item!(opts)
-      @nbuild[NS_EWS_TYPES].AcceptItem {
-        sensitivity!(opts)
-        body!(opts) if opts[:text]
-        reference_item_id!(opts)
-      }
-    end
-
-    def tentatively_accept_item!(opts)
-      @nbuild[NS_EWS_TYPES].TentativelyAcceptItem {
-        sensitivity!(opts)
-        body!(opts) if opts[:text]
-        reference_item_id!(opts)
-      }
-    end
-
-    def decline_item!(opts)
-      @nbuild[NS_EWS_TYPES].DeclineItem {
-        sensitivity!(opts)
-        body!(opts) if opts[:text]
-        reference_item_id!(opts)
-      }
-    end
-
-    def sensitivity!(value)
-      nbuild[NS_EWS_TYPES].Sensitivity(value[:sensitivity])
-    end
 
 private
 
