@@ -111,8 +111,7 @@ class Viewpoint::EWS::Connection
     when 200
       resp.body
     when 302
-      # @todo redirect
-      raise Errors::UnhandledResponseError.new("Unhandled HTTP Redirect", resp)
+      validiate_redirect!(resp)
     when 401
       raise Errors::UnauthorizedResponseError.new("Unauthorized request", resp)
     when 500
@@ -125,6 +124,20 @@ class Viewpoint::EWS::Connection
     else
       raise Errors::ResponseError.new("HTTP Error Code: #{resp.status}, Msg: #{resp.body}", resp)
     end
+  end
+
+  # Follow the redirect location of a response and validate the response to be 200
+  # @param [HTTP:Message] response with status 302
+  # @return [String] response body of followed redirect path
+  def validiate_redirect!(resp)
+    redirect_path = resp.header["Location"].first
+    raise Errors::UnhandledResponseError.new("Unhandled HTTP Redirect", resp) unless redirect_path.present?
+
+    uri = URI.parse(@endpoint)
+    uri.path = redirect_path
+    redirect_resp = @httpcli.get(uri.to_s)
+    raise Errors::UnhandledResponseError.new("Unhandled HTTP Redirect", resp) unless redirect_resp.status == 200
+    redirect_resp.body
   end
 
   # @param [String] xml to parse the errors from.
