@@ -257,7 +257,9 @@ module Viewpoint::EWS::SOAP
     def build_soap!(&block)
       opts = { :server_version => server_version, :impersonation_type => impersonation_type, :impersonation_mail => impersonation_address }
       opts[:time_zone_context] = @time_zone_context if @time_zone_context
-      EwsBuilder.new.build!(opts, &block)
+      builder = uEwsBuilder.new.build!(opts, &block)
+      print builder
+      builder
     end
 
   end # class ExchangeWebService
