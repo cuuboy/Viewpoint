@@ -37,6 +37,7 @@ module Viewpoint::EWS
         self.extended_properties ||= []
         self.references ||= []
         self.in_reply_to ||= nil
+        self.internet_message_id ||= nil
       end
 
       def to_ews_basic
@@ -69,6 +70,7 @@ module Viewpoint::EWS
         msg[:is_read] = is_read
         msg[:in_reply_to] = in_reply_to
         msg[:references] = references
+        msg[:internet_message_id] = internet_message_id
 
         msg[:extended_properties] = extended_properties unless extended_properties.empty?
 

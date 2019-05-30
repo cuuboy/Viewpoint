@@ -948,7 +948,11 @@ module Viewpoint::EWS::SOAP
     end
 
     def references!(refs)
-      nbuild[NS_EWS_TYPES].References(refs.join(" "))
+      nbuild[NS_EWS_TYPES].References(refs)
+    end
+
+    def internet_message_id!(mid)
+      nbuild[NS_EWS_TYPES].InternetMessageId(mid)
     end
 
     def importance!(sub)
