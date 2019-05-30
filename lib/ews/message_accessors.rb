@@ -78,6 +78,7 @@ module Viewpoint::EWS::MessageAccessors
 
   def parse_create_item(resp)
     rm = resp.response_messages[0]
+    binding.pry
     if(rm.status == 'Success')
       rm.items.empty? ? true : parse_message(rm.items.first)
     else

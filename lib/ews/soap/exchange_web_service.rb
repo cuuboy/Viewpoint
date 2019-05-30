@@ -216,6 +216,7 @@ module Viewpoint::EWS::SOAP
     # @param [Hash] opts misc options to send to the parser
     # @option opts [Class] :response_class the response class
     def parse_soap_response(soapmsg, opts = {})
+      binding.pry
       raise EwsError, "Can't parse an empty response. Please check your endpoint." if(soapmsg.nil?)
       opts[:response_class] ||= EwsSoapResponse
       EwsParser.new(soapmsg).parse(opts)
