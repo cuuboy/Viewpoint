@@ -216,7 +216,6 @@ module Viewpoint::EWS::SOAP
     # @param [Hash] opts misc options to send to the parser
     # @option opts [Class] :response_class the response class
     def parse_soap_response(soapmsg, opts = {})
-      binding.pry
       raise EwsError, "Can't parse an empty response. Please check your endpoint." if(soapmsg.nil?)
       opts[:response_class] ||= EwsSoapResponse
       EwsParser.new(soapmsg).parse(opts)
@@ -258,7 +257,9 @@ module Viewpoint::EWS::SOAP
     def build_soap!(&block)
       opts = { :server_version => server_version, :impersonation_type => impersonation_type, :impersonation_mail => impersonation_address }
       opts[:time_zone_context] = @time_zone_context if @time_zone_context
-      EwsBuilder.new.build!(opts, &block)
+      builder = EwsBuilder.new.build!(opts, &block)
+      print builder
+      builder
     end
 
   end # class ExchangeWebService
