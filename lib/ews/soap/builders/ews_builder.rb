@@ -830,6 +830,8 @@ module Viewpoint::EWS::SOAP
           extended_properties! item.delete(:extended_properties)
         end
         item.each_pair {|k,v|
+          print k
+          print v
           self.send("#{k}!", v)
         }
       }
@@ -944,13 +946,17 @@ module Viewpoint::EWS::SOAP
     end
 
     def in_reply_to!(reply_to)
-      nbuild[NS_EWS_TYPES].InReplyTo(reply_to)
+      irt = nbuild[NS_EWS_TYPES].InReplyTo(reply_to)
+      print irt
+      irt
     end
 
     def references!(refs)
-      nbuild[NS_EWS_TYPES].References {
+      ref = nbuild[NS_EWS_TYPES].References {
         refs.each {|ref| mailbox!(ref[:mailbox]) }
       }
+      print ref
+      ref
     end
 
     def importance!(sub)
