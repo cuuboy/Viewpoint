@@ -951,6 +951,7 @@ module Viewpoint::EWS::SOAP
     end
 
     def references!(refs)
+      print refs
       nbuild[NS_EWS_TYPES].References(refs.join(" "))
     end
 
