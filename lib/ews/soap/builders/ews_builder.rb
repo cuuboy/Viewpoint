@@ -946,12 +946,10 @@ module Viewpoint::EWS::SOAP
     end
 
     def in_reply_to!(reply_to)
-      print reply_to
       nbuild[NS_EWS_TYPES].InReplyTo(reply_to)
     end
 
     def references!(refs)
-      print refs
       nbuild[NS_EWS_TYPES].References(refs.join(" "))
     end
 
