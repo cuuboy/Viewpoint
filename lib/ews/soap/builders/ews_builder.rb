@@ -947,16 +947,12 @@ module Viewpoint::EWS::SOAP
 
     def in_reply_to!(reply_to)
       irt = nbuild[NS_EWS_TYPES].InReplyTo(reply_to)
-      print irt
-      irt
     end
 
     def references!(refs)
       ref = nbuild[NS_EWS_TYPES].References {
         refs.each {|ref| mailbox!(ref[:mailbox]) }
       }
-      print ref
-      ref
     end
 
     def importance!(sub)
