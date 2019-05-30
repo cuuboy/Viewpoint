@@ -830,8 +830,6 @@ module Viewpoint::EWS::SOAP
           extended_properties! item.delete(:extended_properties)
         end
         item.each_pair {|k,v|
-          print k
-          print v
           self.send("#{k}!", v)
         }
       }
