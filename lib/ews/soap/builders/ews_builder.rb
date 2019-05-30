@@ -943,6 +943,16 @@ module Viewpoint::EWS::SOAP
       nbuild[NS_EWS_TYPES].Subject(sub)
     end
 
+    def in_reply_to!(reply_to)
+      nbuild[NS_EWS_TYPES].InReplyTo(reply_to)
+    end
+
+    def references!(refs)
+      nbuild[NS_EWS_TYPES].References {
+        refs.each {|ref| mailbox!(ref[:mailbox]) }
+      }
+    end
+
     def importance!(sub)
       nbuild[NS_EWS_TYPES].Importance(sub)
     end
