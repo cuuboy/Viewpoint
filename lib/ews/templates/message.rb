@@ -57,7 +57,9 @@ module Viewpoint::EWS
         msg[:body] = {text: body, body_type: body_type} if body
 
         msg[:importance] = importance if importance
+        msg[:extended_properties] = extended_properties unless extended_properties.blank?
 
+        msg[:in_reply_to] = in_reply_to unless in_reply_to.blank?
         to_r = to_recipients.collect{|r| {mailbox: {email_address: r}}}
         msg[:to_recipients] = to_r unless to_r.empty?
 
@@ -66,13 +68,9 @@ module Viewpoint::EWS
 
         bcc_r = bcc_recipients.collect{|r| {mailbox: {email_address: r}}}
         msg[:bcc_recipients] = bcc_r unless bcc_r.empty?
-
+        msg[:internet_message_id] = internet_message_id unless internet_message_id.blank?
         msg[:is_read] = is_read
-        msg[:in_reply_to] = in_reply_to
-        msg[:references] = references
-        msg[:internet_message_id] = internet_message_id
-
-        msg[:extended_properties] = extended_properties unless extended_properties.empty?
+        msg[:references] = references unless references.blank?
 
         [ews_opts, msg]
       end

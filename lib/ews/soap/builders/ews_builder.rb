@@ -25,6 +25,65 @@ module Viewpoint::EWS::SOAP
     include Viewpoint::StringUtils
 
     attr_reader :nbuild
+
+    VALID_ORDERED_PROPS = [
+        :mime_content,
+        :item_id,
+        :parent_folder_id,
+        :item_class,
+        :subject,
+        :sensitivity,
+        :body,
+        :attachments,
+        :date_time_received,
+        :size,
+        :categories,
+        :importance,
+        :in_reply_to,
+        :is_submitted,
+        :is_draft,
+        :is_from_me,
+        :is_resend,
+        :is_unmodified,
+        :internet_message_headers,
+        :date_time_sent,
+        :date_time_created,
+        :response_objects,
+        :reminder_due_by,
+        :reminder_is_set,
+        :reminder_minutes_before_start,
+        :display_cc,
+        :display_to,
+        :has_attachments,
+        :extended_properties, # extended_property
+        :culture,
+        :sender,
+        :to_recipients,
+        :cc_recipients,
+        :bcc_recipients,
+        :is_read_receipt_requested,
+        :is_delivery_receipt_requested,
+        :conversation_index,
+        :conversation_topic,
+        :from,
+        :internet_message_id,
+        :is_read,
+        :is_response_requested,
+        :references,
+        :reply_to,
+        :effective_rights,
+        :received_by,
+        :received_representing,
+        :last_modified_name,
+        :last_modified_time,
+        :is_associated,
+        :web_client_read_form_query_string,
+        :web_client_edit_form_query_string,
+        :conversation_id,
+        :unique_body,
+        :reminder_message_data
+    ].freeze
+
     def initialize
       @nbuild = Nokogiri::XML::Builder.new
     end
@@ -826,12 +885,10 @@ module Viewpoint::EWS::SOAP
 
     def message!(item)
       nbuild[NS_EWS_TYPES].Message {
-        if item[:extended_properties]
-          extended_properties! item.delete(:extended_properties)
+        VALID_ORDERED_PROPS.each do |prop|
+          next extended_properties! item.delete(:extended_properties) if prop == :extended_properties
+          self.send("#{prop}!", item[prop]) if item.key? prop
         end
-        item.each_pair {|k,v|
-          self.send("#{k}!", v)
-        }
       }
     end
 
