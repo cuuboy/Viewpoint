@@ -886,8 +886,9 @@ module Viewpoint::EWS::SOAP
     def message!(item)
       nbuild[NS_EWS_TYPES].Message {
         VALID_ORDERED_PROPS.each do |prop|
+          next unless item.key? prop
           next extended_properties! item.delete(:extended_properties) if prop == :extended_properties
-          self.send("#{prop}!", item[prop]) if item.key? prop
+          self.send("#{prop}!", item[prop])
         end
       }
     end
