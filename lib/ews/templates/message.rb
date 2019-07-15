@@ -38,6 +38,7 @@ module Viewpoint::EWS
         self.references ||= []
         self.in_reply_to ||= nil
         self.internet_message_id ||= nil
+        self.mime_content ||= nil
       end
 
       def to_ews_basic
@@ -71,6 +72,7 @@ module Viewpoint::EWS
         msg[:internet_message_id] = internet_message_id unless internet_message_id.blank?
         msg[:is_read] = is_read
         msg[:references] = references unless references.blank?
+        msg[:mime_content] = mime_content unless mime_content.blank?
 
         [ews_opts, msg]
       end
